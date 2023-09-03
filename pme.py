@@ -85,7 +85,7 @@ class LayerGridDockWidget(QDockWidget):
 
 class PlanetMosaicExplorerWidget(QWidget):
     def __init__(self):
-        super(PlanetMosaicSliderWidget, self).__init__()
+        super(PlanetMosaicExplorerWidget, self).__init__()
 
         if not PLANET_API_KEY:
             msg = iface.messageBar().createMessage("FETCH_MOSAICS", "Please provide your PLANET_API_KEY.")
