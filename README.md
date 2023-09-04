@@ -4,7 +4,7 @@
 
 This Python code provides a custom QGIS plugin widget that allows users to interact with time-series mosaics from Planet's API. It includes functionalities like filtering mosaics by date, zooming to a specific point, and a time-lapse feature that plays through the mosaics in time order. Additionally, it includes a Layer Grid view to display small previews of all layers in a grid.
 
-[![Demo Video](http://img.youtube.com/vi/7-GBlTpv4X8/0.jpg)](http://www.youtube.com/watch?v=7-GBlTpv4X8)
+![Sentinel Image Explorer ](./pme.gif)
 
 ## Features
 
