@@ -8,7 +8,7 @@ from qgis.gui import QgsMapCanvas
 from qgis.utils import iface
 from datetime import datetime
 
-PLANET_API_KEY = 'e5ab79625244442295b4093991353285'
+PLANET_API_KEY = ''
 
 layerGridDockWidgetInstance = None
 
