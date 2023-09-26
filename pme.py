@@ -8,7 +8,7 @@ from qgis.gui import QgsMapCanvas
 from qgis.utils import iface
 from datetime import datetime
 
-PLANET_API_KEY = 'e5ab79625244442295b4093991353285'
+PLANET_API_KEY = ''
 
 layerGridDockWidgetInstance = None
 
@@ -37,44 +37,50 @@ class LayerGridDockWidget(QDockWidget):
         self.updateGrid(layers)
 
     def updateGrid(self, layers):
-        # Clear existing widgets from the layout
-        for i in reversed(range(self.layout.count())):
-            widget = self.layout.itemAt(i).widget()
-            if widget is not None:
-                widget.deleteLater()
+        try:
+            # Clear existing widgets from the layout
+            for i in reversed(range(self.layout.count())):
+                widget = self.layout.itemAt(i).widget()
+                if widget is not None:
+                    widget.deleteLater()
 
-        self.canvases = []
+            self.canvases = []
 
-        # Sort layers by date if possible
-        def sort_key(layer):
-            try:
-                return datetime.strptime(layer.name(), '%m/%Y')
-            except Exception as e:
-                msg = iface.messageBar().createMessage("sort_key", f"Error -> {e}")
-                iface.messageBar().pushWidget(msg, level=Qgis.Critical)
-                pass
+            # Sort layers by date if possible
+            def sort_key(layer):
+                try:
+                    return datetime.strptime(layer.name(), '%m/%Y')
+                except Exception as e:
+                    msg = iface.messageBar().createMessage("sort_key", f"Error -> {e}")
+                    iface.messageBar().pushWidget(msg, level=Qgis.Critical)
+                    pass
 
-        sorted_layers = sorted(layers, key=sort_key, reverse=True)
+            sorted_layers = sorted(layers, key=sort_key, reverse=True)
 
-        # Add sorted layers to layout
-        row = 0
-        col = 0
-        for layer in sorted_layers:
-            label = QLabel(layer.name())
-            canvas = QgsMapCanvas()
-            canvas.setCanvasColor(Qt.white)
-            canvas.setExtent(layer.extent())
-            canvas.setLayers([layer])
+            # Add sorted layers to layout
+            row = 0
+            col = 0
+            for layer in sorted_layers:
+                label = QLabel(layer.name())
+                canvas = QgsMapCanvas()
+                canvas.setCanvasColor(Qt.white)
+                canvas.setExtent(layer.extent())
+                canvas.setLayers([layer])
 
-            self.canvases.append(canvas)
+                self.canvases.append(canvas)
 
-            self.layout.addWidget(label, row, col)
-            self.layout.addWidget(canvas, row + 1, col)
+                self.layout.addWidget(label, row, col)
+                self.layout.addWidget(canvas, row + 1, col)
 
-            col += 1
-            if col > 2:
-                col = 0
-                row += 2
+                col += 1
+                if col > 2:
+                    col = 0
+                    row += 2
+                    
+        except Exception as e:
+            msg = iface.messageBar().createMessage("updateGrid", f"Error -> {e}")
+            iface.messageBar().pushWidget(msg, level=Qgis.Critical)
+            pass
 
     def sync_zoom(self):
         try:
@@ -116,7 +122,7 @@ class PlanetMosaicExplorerWidget(QWidget):
             # Add date filters
             self.hbox.addWidget(self.startLabel)
             self.startDateEdit = QDateEdit()
-            self.startDateEdit.setDate(QDate.currentDate())
+            self.startDateEdit.setDate(QDate.currentDate().addYears(-1))
             self.startDateEdit.setCalendarPopup(True)
             self.startDateEdit.setFixedWidth(100)
             self.startDateEdit.setDisplayFormat("dd/MM/yyyy")
@@ -230,7 +236,7 @@ class PlanetMosaicExplorerWidget(QWidget):
     def init(self):
         try:
             # Sort mosaics by date in descending order (most recent first)
-            self.mosaics_data.sort(key=lambda x: datetime.strptime(x['name'], '%m/%Y'), reverse=True)
+            self.mosaics_data.sort(key=lambda x: datetime.strptime(x['name'], '%m/%Y'), reverse=False)
 
             self.slider.setMinimum(1)
             self.slider.setMaximum(len(self.mosaics_data))
@@ -267,7 +273,7 @@ class PlanetMosaicExplorerWidget(QWidget):
 
         if layer.isValid():
             QgsProject.instance().addMapLayer(layer)
-            QgsProject.instance().layerTreeRoot().findLayer(layer).setItemVisibilityChecked(False)
+            QgsProject.instance().layerTreeRoot().findLayer(layer).setItemVisibilityChecked(True)
             return layer.id()
 
         return None
